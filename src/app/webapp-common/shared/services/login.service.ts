@@ -32,6 +32,13 @@ export const loginModes = {
   tenantInput: 'tenant' as LoginMode
 };
 
+export interface SSOProvider {
+  name: string;
+  url: string;
+  display_name?: string;
+  displayName?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -46,6 +53,7 @@ export class BaseLoginService {
   protected locationStrategy = inject(LocationStrategy);
 
   loginMode = signal<LoginMode>(null);
+  ssoProviders = signal<SSOProvider[]>([]);
   protected basePath = HTTP.API_BASE_URL;
   private userKey: string;
   private userSecret: string;
@@ -120,6 +128,10 @@ export class BaseLoginService {
             this.authenticated = res.authenticated;
             this._loginMode = this.calcLoginMode(res);
             this._loginModeTTL = new Date().getTime() + TIME_IN_MILLI.ONE_MIN * 10;
+            // Store SSO providers from the API response
+            if (res.sso_providers && res.sso_providers.length > 0) {
+              this.ssoProviders.set(res.sso_providers);
+            }
           }),
           map(() => {
             this.loginMode.set(this._loginMode);

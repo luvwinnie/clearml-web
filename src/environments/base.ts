@@ -76,8 +76,8 @@ export interface Environment {
 
 export const BASE_ENV = {
   production: true,
-  apiBaseUrl: null,
-  fileBaseUrl: null,
+  apiBaseUrl: '/api',
+  fileBaseUrl: '/files',
   productName: 'clearml',
   demo: false,
   headerPrefix: 'X-Clearml',

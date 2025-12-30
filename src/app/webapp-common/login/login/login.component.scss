@@ -180,6 +180,73 @@
   text-align: left;
 }
 
+.sso-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 8px 0 16px 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  span {
+    padding: 0 16px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}
+
+.sso-button {
+  width: 100%;
+  margin-bottom: 12px !important;
+  padding: 12px 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  color: #fff !important;
+  background: transparent !important;
+  font-size: 14px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  .sso-icon {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+  }
+}
+
+:host-context(.light-theme) {
+  .sso-divider {
+    &::before,
+    &::after {
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+    }
+
+    span {
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .sso-button {
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05) !important;
+      border-color: rgba(0, 0, 0, 0.5) !important;
+    }
+  }
+}
+
 .other-email {
   margin-top: 16px;
   text-align: left;

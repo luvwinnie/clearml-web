@@ -1,0 +1,31 @@
+# Multi-stage build for ClearML Web with OIDC support
+# Build: docker build -t luvwinnie/clearml-web:oidc -f Dockerfile.oidc .
+#
+# This Dockerfile builds the Angular app with OIDC SSO button support
+# and packages it with the stock ClearML webserver infrastructure.
+
+# Stage 1: Build the Angular app with Node 20
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (using legacy-peer-deps due to Angular Material version conflicts)
+RUN npm ci --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+# Build the production app
+RUN npm run build
+
+# Stage 2: Use the stock ClearML image and replace the built web files
+FROM allegroai/clearml:latest
+
+# Remove the stock web files and copy our built Angular app
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=builder /app/build/browser /usr/share/nginx/html
+
+# The stock image's wrapper.sh and nginx config handle everything else

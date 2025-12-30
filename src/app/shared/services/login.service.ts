@@ -1,1 +1,1 @@
-export {BaseLoginService as LoginService} from '@common/shared/services/login.service';
+export {BaseLoginService as LoginService, SSOProvider} from '@common/shared/services/login.service';

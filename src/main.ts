@@ -18,9 +18,25 @@ if (environment.production) {
     (window as any).configuration = configData;
   } finally {
     const baseHref = (window as any).__env.subPath || '' as string;
-    updateHttpUrlBaseConstant({...environment, ...configData, ...(baseHref && !baseHref.startsWith('${') && {apiBaseUrl: baseHref + environment.apiBaseUrl})});
+    // Use configData.apiBaseUrl if provided (from configuration.json), otherwise fall back to environment.apiBaseUrl
+    const effectiveApiBaseUrl = configData.apiBaseUrl || environment.apiBaseUrl;
+    // Only prepend baseHref if apiBaseUrl is not already an absolute path (doesn't start with /)
+    const needsBaseHref = baseHref && !baseHref.startsWith('${') && !effectiveApiBaseUrl.startsWith('/');
+    updateHttpUrlBaseConstant({...environment, ...configData, ...(needsBaseHref && {apiBaseUrl: baseHref + effectiveApiBaseUrl})});
+
+    // Calculate effective base href for router:
+    // 1. Use explicit baseHref from configuration.json if set
+    // 2. Otherwise, use subPath with proper formatting (add leading/trailing slashes)
+    let effectiveBaseHref = configData.baseHref;
+    if (!effectiveBaseHref && baseHref) {
+      effectiveBaseHref = baseHref.startsWith('/') ? baseHref : '/' + baseHref;
+      if (!effectiveBaseHref.endsWith('/')) {
+        effectiveBaseHref += '/';
+      }
+    }
+
     await platformBrowser([
-      {provide: APP_BASE_HREF, useValue: configData.baseHref ?? ''}
+      {provide: APP_BASE_HREF, useValue: effectiveBaseHref ?? ''}
     ]).bootstrapModule(AppModule);
   }
 })();

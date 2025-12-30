@@ -26,7 +26,7 @@ import {selectInviteId} from '../login-reducer';
 import {ConfigurationService} from '../../shared/services/configuration.service';
 import {ConfirmDialogComponent} from '../../shared/ui-components/overlay/confirm-dialog/confirm-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
-import {LoginService} from '~/shared/services/login.service';
+import {LoginService, SSOProvider} from '~/shared/services/login.service';
 import {UserPreferences} from '../../user-preferences';
 import {setBreadcrumbs} from '@common/core/actions/router.actions';
 import {CrumbTypeEnum} from '@common/layout/breadcrumbs/breadcrumbs.component';
@@ -84,6 +84,7 @@ export class LoginComponent {
   private githubButton = viewChild(NtkmeButtonComponent);
   protected environment = this.config.configuration;
   protected loginMode = this.loginService.loginMode;
+  protected ssoProviders = this.loginService.ssoProviders;
 
   protected showLogin = computed(() => this.showSimpleLogin() || [loginModes.password, loginModes.simple].includes(this.loginMode()));
 
@@ -291,5 +292,10 @@ export class LoginComponent {
   private setTheme(theme: 'light' | 'dark' | 'system') {
     this.store.dispatch(userThemeChanged({theme}));
     this.document.body.parentElement.classList.add(`${theme}-mode`);
+  }
+
+  loginWithSSO(provider: SSOProvider) {
+    // Redirect to the SSO provider URL
+    window.location.href = provider.url;
   }
 }
