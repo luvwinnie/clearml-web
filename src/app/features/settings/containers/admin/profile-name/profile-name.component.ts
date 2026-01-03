@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {Store} from '@ngrx/store';
+import {TitleCasePipe} from '@angular/common';
 import {selectCurrentUser} from '@common/core/reducers/users-reducer';
 import {updateCurrentUser} from '@common/core/actions/users.actions';
 import {GetCurrentUserResponseUserObject} from '~/business-logic/model/users/getCurrentUserResponseUserObject';
@@ -15,7 +16,8 @@ import {IdBadgeComponent} from '@common/shared/components/id-badge/id-badge.comp
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     InlineEditComponent,
-    IdBadgeComponent
+    IdBadgeComponent,
+    TitleCasePipe
   ]
 })
 export class ProfileNameComponent {

@@ -25,5 +25,13 @@
         </div>
       </div>
     }
+    @if (currentUser().role) {
+      <div class="d-flex flex-column align-items-center">
+        <div class="profile-label">ROLE</div>
+        <div class="role-badge" [class.admin]="currentUser().role === 'admin'">
+          {{ currentUser().role | titlecase }}
+        </div>
+      </div>
+    }
   </div>
 }
