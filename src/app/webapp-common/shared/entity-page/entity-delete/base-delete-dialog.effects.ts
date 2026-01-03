@@ -217,9 +217,22 @@ export class DeleteDialogEffectsBase {
               if (this.errorService.lastRunError(error.error)) {
                 return this.handleLastRun(projectId || entities[0]?.project?.id);
               }
+              // Extract error message for display in dialog
+              const errorMessage = error?.error?.meta?.result_msg ||
+                error?.meta?.result_msg ||
+                error?.message ||
+                'Permission denied';
+              // Create failed entity entries for the dialog to display
+              const failedEntities = entities.map(entity => ({
+                id: entity.id,
+                name: entity.name || entity.id,
+                message: errorMessage
+              }));
               return [
                 requestFailed(error),
                 deactivateLoader(action.type),
+                setNumberOfSourcesToDelete({numberOfFiles: 0}),
+                setFailedDeletedEntities({failedEntities}),
                 setServerError(error, null, `Can't delete ${action.entityType} ${error?.meta?.error_data?.id || ''}`)
               ];
             })

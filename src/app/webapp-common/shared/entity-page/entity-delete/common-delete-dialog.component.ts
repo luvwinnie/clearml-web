@@ -89,6 +89,22 @@ export class CommonDeleteDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Track failed entities locally for race condition handling
+    let failedEntitiesCount = 0;
+
+    // Subscribe to failed entities FIRST to capture failures before filesNumber triggers
+    this.store.select(selectEntitiesFailedToDelete).pipe(takeUntil(this.unsubscribe$)).subscribe(failed => {
+      failedEntitiesCount = failed?.length || 0;
+      if (failedEntitiesCount > 0) {
+        // Force progress to 100% so CLOSE button is enabled
+        this.progressPercent = 100;
+        this.noFilesToDelete = true;
+        this.totalFilesNumber = 0;
+        this.isOpenEntities = true;
+        this.showFinishMessage = true;
+      }
+    });
+
     this.filesNumber$.pipe(takeUntil(this.unsubscribe$)).subscribe(filesNumber => {
       if (this.firstTime(filesNumber)) {
         this.noFilesToDelete = filesNumber === 0;
@@ -96,11 +112,14 @@ export class CommonDeleteDialogComponent implements OnInit, OnDestroy {
       }
       this.progressPercent = this.noFilesToDelete ? 100 : Math.round((this.totalFilesNumber - filesNumber) / this.totalFilesNumber * 100) || 0;
       if (this.progressPercent > 99) {
-        if (this.failedFiles?.length > 0 || this.isOpenEntities) {
-          window.setTimeout(() => this.showFinishMessage = true, 1000);
-        } else {
-          this.closeDialog(true);
-        }
+        // Use setTimeout to allow other state updates (like failedEntities) to be processed first
+        window.setTimeout(() => {
+          if (this.failedFiles?.length > 0 || this.isOpenEntities || failedEntitiesCount > 0) {
+            this.showFinishMessage = true;
+          } else {
+            this.closeDialog(true);
+          }
+        }, 100);
       }
     });
 
